@@ -11,14 +11,10 @@
 Option Strict On
 Option Explicit On
 
-Imports System.CodeDom.Compiler
-Imports System.ComponentModel
-Imports System.Globalization
-Imports System.Resources
-Imports System.Runtime.CompilerServices
+Imports System
 
 Namespace My.Resources
-
+    
     'Diese Klasse wurde von der StronglyTypedResourceBuilder automatisch generiert
     '-Klasse über ein Tool wie ResGen oder Visual Studio automatisch generiert.
     'Um einen Member hinzuzufügen oder zu entfernen, bearbeiten Sie die .ResX-Datei und führen dann ResGen
@@ -26,41 +22,41 @@ Namespace My.Resources
     '''<summary>
     '''  Eine stark typisierte Ressourcenklasse zum Suchen von lokalisierten Zeichenfolgen usw.
     '''</summary>
-    <GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0"),
-     DebuggerNonUserCode(),
-     CompilerGenerated(),
-     HideModuleName()>
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0"),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
+     Global.Microsoft.VisualBasic.HideModuleNameAttribute()>  _
     Friend Module Resources
-
-        Private resourceMan As ResourceManager
-
-        Private resourceCulture As CultureInfo
-
+        
+        Private resourceMan As Global.System.Resources.ResourceManager
+        
+        Private resourceCulture As Global.System.Globalization.CultureInfo
+        
         '''<summary>
         '''  Gibt die zwischengespeicherte ResourceManager-Instanz zurück, die von dieser Klasse verwendet wird.
         '''</summary>
-        <EditorBrowsable(EditorBrowsableState.Advanced)>
-        Friend ReadOnly Property ResourceManager() As ResourceManager
+        <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
+        Friend ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
             Get
-                If ReferenceEquals(resourceMan, Nothing) Then
-                    Dim temp As ResourceManager = New ResourceManager("AES_TextCryptor.Resources", GetType(Resources).Assembly)
+                If Object.ReferenceEquals(resourceMan, Nothing) Then
+                    Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("AES_TextCryptor.Resources", GetType(Resources).Assembly)
                     resourceMan = temp
                 End If
                 Return resourceMan
             End Get
         End Property
-
+        
         '''<summary>
         '''  Überschreibt die CurrentUICulture-Eigenschaft des aktuellen Threads für alle
         '''  Ressourcenzuordnungen, die diese stark typisierte Ressourcenklasse verwenden.
         '''</summary>
-        <EditorBrowsable(EditorBrowsableState.Advanced)>
-        Friend Property Culture() As CultureInfo
+        <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
+        Friend Property Culture() As Global.System.Globalization.CultureInfo
             Get
                 Return resourceCulture
             End Get
             Set
-                resourceCulture = Value
+                resourceCulture = value
             End Set
         End Property
     End Module

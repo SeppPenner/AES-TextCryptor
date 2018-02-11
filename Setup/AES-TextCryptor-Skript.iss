@@ -2,10 +2,11 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AES-TextCryptor"
-#define MyAppVersion "1.0.0.0"
+#define MyAppVersion "1.0.0.1"
 #define MyAppPublisher "Hämmer Electronics"
 #define MyAppURL "http://www.softwareload24.de.tl"
 #define MyAppExeName "AES-TextCryptor.exe"
+#define MyPath "F:\TODO\C# und VB\AES-TextCryptor"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -25,10 +26,10 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=C:\Users\Tim\Desktop\AES-TextCryptor\AES-TextCryptor\License.txt
-OutputDir=C:\Users\Tim\Desktop\AES-TextCryptor\AES-TextCryptor\Setup
+LicenseFile={#MyPath}\AES-TextCryptor\License.txt
+OutputDir={#MyPath}\Setup
 OutputBaseFilename=AES-TextCryptor-Setup
-SetupIconFile=C:\Users\Tim\Desktop\AES-TextCryptor\AES-TextCryptor\AES.ico
+SetupIconFile={#MyPath}\AES-TextCryptor\AES.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -41,9 +42,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "C:\Users\Tim\Desktop\AES-TextCryptor\AES-TextCryptor\bin\Debug\AES-TextCryptor.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Tim\Desktop\AES-TextCryptor\AES-TextCryptor\AES.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Tim\Desktop\AES-TextCryptor\AES-TextCryptor\bin\Debug\Config.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\AES-TextCryptor\bin\Debug\AES-TextCryptor.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\AES-TextCryptor\AES.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\AES-TextCryptor\bin\Debug\Config.ini"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

@@ -11,29 +11,28 @@
 Option Strict On
 Option Explicit On
 
-Imports Microsoft.VisualBasic.ApplicationServices
 
 Namespace My
-
-    'HINWEIS: Diese Datei wird automatisch generiert und darf nicht direkt bearbeitet werden. Wenn Sie Änderungen vornehmen möchten,
-    ' oder bei in dieser Datei auftretenden Buildfehlern wechseln Sie zum Projekt-Designer.
+    
+    'HINWEIS: Diese Datei wird automatisch generiert und darf nicht direkt bearbeitet werden.  Wenn Sie Änderungen vornehmen möchten
+    ' oder in dieser Datei Buildfehler auftreten, wechseln Sie zum Projekt-Designer.
     ' (Wechseln Sie dazu zu den Projekteigenschaften, oder doppelklicken Sie auf den Knoten "Mein Projekt" im
     ' Projektmappen-Explorer). Nehmen Sie auf der Registerkarte "Anwendung" entsprechende Änderungen vor.
     '
     Partial Friend Class MyApplication
-
-        <DebuggerStepThrough()>
+        
+        <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Public Sub New()
-            MyBase.New(AuthenticationMode.Windows)
-            Me.IsSingleInstance = False
-            Me.EnableVisualStyles = True
-            Me.SaveMySettingsOnExit = True
-            Me.ShutdownStyle = ShutdownMode.AfterMainFormCloses
+            MyBase.New(Global.Microsoft.VisualBasic.ApplicationServices.AuthenticationMode.Windows)
+            Me.IsSingleInstance = false
+            Me.EnableVisualStyles = true
+            Me.SaveMySettingsOnExit = true
+            Me.ShutDownStyle = Global.Microsoft.VisualBasic.ApplicationServices.ShutdownMode.AfterMainFormCloses
         End Sub
-
-        <DebuggerStepThrough()>
+        
+        <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = AES_TextCryptor.Main
+            Me.MainForm = Global.AES_TextCryptor.Main
         End Sub
     End Class
 End Namespace
