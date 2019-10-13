@@ -23,7 +23,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={commonpf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile={#MyPath}\AES-TextCryptor\License.txt
@@ -44,7 +44,7 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 [Files]
 Source: "{#MyPath}\AES-TextCryptor\bin\Release\AES-TextCryptor.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyPath}\AES-TextCryptor\AES.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyPath}\AES-TextCryptor\bin\Debug\Config.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\AES-TextCryptor\bin\Release\Config.ini"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
