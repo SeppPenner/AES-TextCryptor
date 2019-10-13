@@ -2,11 +2,11 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AES-TextCryptor"
-#define MyAppVersion "1.0.0.2"
+#define MyAppVersion "1.0.1.0"
 #define MyAppPublisher "Hämmer Electronics"
 #define MyAppURL "http://www.softwareload24.de.tl"
 #define MyAppExeName "AES-TextCryptor.exe"
-#define MyPath "C:\Users\tim\Desktop\Updaten_Snyk\AES-TextCryptor"
+#define MyPath "C:\Users\Tim\Documents\Git\C# und VB\AES-TextCryptor"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -42,7 +42,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "{#MyPath}\AES-TextCryptor\bin\Debug\AES-TextCryptor.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\AES-TextCryptor\bin\Release\AES-TextCryptor.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyPath}\AES-TextCryptor\AES.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyPath}\AES-TextCryptor\bin\Debug\Config.ini"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
