@@ -2,7 +2,7 @@ AES-TextCryptor
 ===============
 
 AES-TextCryptor is an executable to encrypt and decrypt strings.
-The executable was written and tested in .Net 4.8.
+The executable was written and tested in .Net 5.0.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/g6cm8rov8b4ea07q?svg=true)](https://ci.appveyor.com/project/SeppPenner/aes-textcryptor)
 [![GitHub issues](https://img.shields.io/github/issues/SeppPenner/AES-TextCryptor.svg)](https://github.com/SeppPenner/AES-TextCryptor/issues)
@@ -23,7 +23,4 @@ Edit the config.ini file in the application directory: EN and DE are valid input
 Change history
 --------------
 
-* **Version 1.0.1.0 (2019-10-13)** : Updated nuget packages, added GitVersionTask.
-* **Version 1.0.0.2 (2019-05-07)** : Updated .Net version to 4.8.
-* **Version 1.0.0.1 (2018-02-11)** : Switched to .Net to 4.7.
-* **Version 1.0.0.0 (2017-03-22)** : 1.0 release.
+See the [Changelog](https://github.com/SeppPenner/AES-TextCryptor/blob/master/Changelog.md).
