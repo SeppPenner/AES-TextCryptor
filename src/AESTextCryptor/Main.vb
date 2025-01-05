@@ -1,4 +1,4 @@
-﻿Option Strict On
+Option Strict On
 
 Imports System.IO
 Imports System.Reflection
@@ -18,6 +18,7 @@ Public Class Main
             If (directoryLocation <> Nothing) Then
                 configFile = Path.Combine(Directory.GetParent(directoryLocation).FullName, "Config.ini")
             End If
+
             Dim fs = New FileStream(configFile, FileMode.OpenOrCreate, FileAccess.ReadWrite)
             'Stream öffnen
             Dim r = New StreamReader(fs)
@@ -25,7 +26,7 @@ Public Class Main
             r.BaseStream.Seek(0, SeekOrigin.Begin)
             'Alle Zeilen lesen und an Console ausgeben
             While r.Peek() > -1
-                _sprache = r.ReadLine() 'Sprache festsetzen
+                Me._sprache = r.ReadLine() 'Sprache festsetzen
             End While
             'Reader und Stream schließen
             r.Close()
@@ -34,77 +35,77 @@ Public Class Main
             MessageBox.Show(ex.Message) 'Fehlermeldung ausgeben
         End Try
         'Verschlüsselungsarten anzeigen:
-        ComboBox_Art.Items.Add("AES-256") 'AES-256 als Verschlüsselungsart hinzufügen
-        ComboBox_Art.Items.Add("AES-128") 'AES-128 als Verschlüsselungsart hinzufügen
-        ComboBox_Art.SelectedIndex = 0 'Vorauswahl setzen, dass Combobox nicht leer
+        Me.ComboBox_Art.Items.Add("AES-256") 'AES-256 als Verschlüsselungsart hinzufügen
+        Me.ComboBox_Art.Items.Add("AES-128") 'AES-128 als Verschlüsselungsart hinzufügen
+        Me.ComboBox_Art.SelectedIndex = 0 'Vorauswahl setzen, dass Combobox nicht leer
         'Sprache anpassen:
-        Select Case _sprache
+        Select Case Me._sprache
             Case "DE"
-                Call AllesAufDeutsch() 'Alles auf Deutsch übersetzen
-                RadioButton_Deutsch.Checked = True 'RadioButton_Deutsch auswählen
+                Call Me.AllesAufDeutsch() 'Alles auf Deutsch übersetzen
+                Me.RadioButton_Deutsch.Checked = True 'RadioButton_Deutsch auswählen
             Case Else
-                Call AllesAufEnglisch() 'Alles auf Englisch übersetzen
-                RadioButton_Englisch.Checked = True 'RadioButton_Englisch auswählen
+                Call Me.AllesAufEnglisch() 'Alles auf Englisch übersetzen
+                Me.RadioButton_Englisch.Checked = True 'RadioButton_Englisch auswählen
         End Select
     End Sub
 
     Private Sub RadioButton_Deutsch_CheckedChanged(sender As Object, e As EventArgs) _
         Handles RadioButton_Deutsch.CheckedChanged
-        If RadioButton_Deutsch.Checked = True Then
-            Call AllesAufDeutsch() 'Alles auf Deutsch übersetzen
+        If Me.RadioButton_Deutsch.Checked = True Then
+            Call Me.AllesAufDeutsch() 'Alles auf Deutsch übersetzen
         Else
-            Call AllesAufEnglisch() 'Alles auf Englisch übersetzen
+            Call Me.AllesAufEnglisch() 'Alles auf Englisch übersetzen
         End If
     End Sub
 
     Private Sub RadioButton_Englisch_CheckedChanged(sender As Object, e As EventArgs) _
         Handles RadioButton_Englisch.CheckedChanged
-        If RadioButton_Englisch.Checked = True Then
-            Call AllesAufEnglisch() 'Alles auf Englisch übersetzen
+        If Me.RadioButton_Englisch.Checked = True Then
+            Call Me.AllesAufEnglisch() 'Alles auf Englisch übersetzen
         Else
-            Call AllesAufDeutsch() 'Alles auf Deutsch übersetzen
+            Call Me.AllesAufDeutsch() 'Alles auf Deutsch übersetzen
         End If
     End Sub
 
     Private Sub AllesAufDeutsch() 'Alles auf Deutsch übersetzen
-        Text = "AES Textverschlüsselung" 'Text von Form setzen
-        Label_Art.Text = "Bitte Verschlüsselungsart auswählen:" 'Label_Art Text setzen
-        Label_Salt.Text = "Salteingabe:" 'Label_Salt Text setzen
-        Label_Passwort.Text = "Passworteingabe:" 'Label_Passwort Text setzen
-        Label_Eingabe.Text = "Texteingabe:" 'Label_Eingabe Text setzen
-        Label_Ausgabe.Text = "Textausgabe:" 'Label_Ausgabe Text setzen
-        Button_Verschluesseln.Text = "Verschlüsseln" 'Button_Verschluesseln Text setzen
-        Button_Entschluesseln.Text = "Entschlüsseln" 'Button_Entschluesseln Text setzen
-        Button_Alle_Resetten.Text = "Alles löschen" 'Button_Alle_Resetten Text setzen
-        Label_Sprache.Text = "Sprache auswählen:" 'Label_Sprache Text setzen
-        RadioButton_Deutsch.Text = "Deutsch" 'RadioButton_Deutsch Text setzen
-        RadioButton_Englisch.Text = "Englisch" 'RadioButton_Englisch Text setzen
-        _sprache = "DE" 'Sprache festlegen
+        Me.Text = "AES Textverschlüsselung" 'Text von Form setzen
+        Me.Label_Art.Text = "Bitte Verschlüsselungsart auswählen:" 'Label_Art Text setzen
+        Me.Label_Salt.Text = "Salteingabe:" 'Label_Salt Text setzen
+        Me.Label_Passwort.Text = "Passworteingabe:" 'Label_Passwort Text setzen
+        Me.Label_Eingabe.Text = "Texteingabe:" 'Label_Eingabe Text setzen
+        Me.Label_Ausgabe.Text = "Textausgabe:" 'Label_Ausgabe Text setzen
+        Me.Button_Verschluesseln.Text = "Verschlüsseln" 'Button_Verschluesseln Text setzen
+        Me.Button_Entschluesseln.Text = "Entschlüsseln" 'Button_Entschluesseln Text setzen
+        Me.Button_Alle_Resetten.Text = "Alles löschen" 'Button_Alle_Resetten Text setzen
+        Me.Label_Sprache.Text = "Sprache auswählen:" 'Label_Sprache Text setzen
+        Me.RadioButton_Deutsch.Text = "Deutsch" 'RadioButton_Deutsch Text setzen
+        Me.RadioButton_Englisch.Text = "Englisch" 'RadioButton_Englisch Text setzen
+        Me._sprache = "DE" 'Sprache festlegen
     End Sub
 
     Private Sub AllesAufEnglisch() 'Alles auf Englisch übersetzen
-        Text = "AES Text Cryptor" 'Text von Form setzen
-        Label_Art.Text = "Choose encryption method:" 'Label_Art Text setzen
-        Label_Salt.Text = "Salt input:" 'Label_Salt Text setzen
-        Label_Passwort.Text = "Password input:" 'Label_Passwort Text setzen
-        Label_Eingabe.Text = "Text input:" 'Label_Eingabe Text setzen
-        Label_Ausgabe.Text = "Text output:" 'Label_Ausgabe Text setzen
-        Button_Verschluesseln.Text = "Encrypt" 'Button_Verschluesseln Text setzen
-        Button_Entschluesseln.Text = "Decrypt" 'Button_Entschluesseln Text setzen
-        Button_Alle_Resetten.Text = "Clear all" 'Button_Alle_Resetten Text setzen
-        Label_Sprache.Text = "Choose language:" 'Label_Sprache Text setzen
-        RadioButton_Deutsch.Text = "German" 'RadioButton_Deutsch Text setzen
-        RadioButton_Englisch.Text = "English" 'RadioButton_Englisch Text setzen
-        _sprache = "EN" 'Sprache festlegen
+        Me.Text = "AES Text Cryptor" 'Text von Form setzen
+        Me.Label_Art.Text = "Choose encryption method:" 'Label_Art Text setzen
+        Me.Label_Salt.Text = "Salt input:" 'Label_Salt Text setzen
+        Me.Label_Passwort.Text = "Password input:" 'Label_Passwort Text setzen
+        Me.Label_Eingabe.Text = "Text input:" 'Label_Eingabe Text setzen
+        Me.Label_Ausgabe.Text = "Text output:" 'Label_Ausgabe Text setzen
+        Me.Button_Verschluesseln.Text = "Encrypt" 'Button_Verschluesseln Text setzen
+        Me.Button_Entschluesseln.Text = "Decrypt" 'Button_Entschluesseln Text setzen
+        Me.Button_Alle_Resetten.Text = "Clear all" 'Button_Alle_Resetten Text setzen
+        Me.Label_Sprache.Text = "Choose language:" 'Label_Sprache Text setzen
+        Me.RadioButton_Deutsch.Text = "German" 'RadioButton_Deutsch Text setzen
+        Me.RadioButton_Englisch.Text = "English" 'RadioButton_Englisch Text setzen
+        Me._sprache = "EN" 'Sprache festlegen
     End Sub
 
     Private Sub Button_Verschluesseln_Click(sender As Object, e As EventArgs) Handles Button_Verschluesseln.Click _
         'Text verschlüsseln
         Try
-            Select Case ComboBox_Art.SelectedIndex
+            Select Case Me.ComboBox_Art.SelectedIndex
                 Case 0 'AES-256 ausgewählt
-                    If RichTextBox_Passwort.Text = "" Or RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
-                        Select Case _sprache
+                    If Me.RichTextBox_Passwort.Text = "" Or Me.RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
+                        Select Case Me._sprache
                             Case "DE"
                                 MessageBox.Show("Passwort oder Texteingabe ist leer") 'Fehlermeldung ausgeben
                             Case Else
@@ -112,26 +113,26 @@ Public Class Main
                         End Select
                     Else 'Wenn Felder gefüllt sind
 
-                        If RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
-                            Select Case _sprache
+                        If Me.RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
+                            Select Case Me._sprache
                                 Case "DE"
                                     MessageBox.Show("Saltwert muss mindestens 8 Zeichen enthalten") _
-                                'Fehlermeldung ausgeben
+                                    'Fehlermeldung ausgeben
                                 Case Else
                                     MessageBox.Show("Salt value must contain at least 8 characters") _
                                     'Fehlermeldung ausgeben
                             End Select
                         Else
-                            _salt = Encoding.UTF32.GetBytes(RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
-                            Call EncryptAes(256, RichTextBox_Eingabe.Text, RichTextBox_Passwort.Text) _
+                            Me._salt = Encoding.UTF32.GetBytes(Me.RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
+                            Call Me.EncryptAes(256, Me.RichTextBox_Eingabe.Text, Me.RichTextBox_Passwort.Text) _
                             'Verschlüsselung aufrufen
-                            RichTextBox_Ausgabe.Clear() 'Ausgabebox leeren
-                            RichTextBox_Ausgabe.Text = _encryptedString 'Verschlüsselten Text ausgeben
+                            Me.RichTextBox_Ausgabe.Clear() 'Ausgabebox leeren
+                            Me.RichTextBox_Ausgabe.Text = Me._encryptedString 'Verschlüsselten Text ausgeben
                         End If
                     End If
                 Case 1 'AES-128 ausgewählt
-                    If RichTextBox_Passwort.Text = "" Or RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
-                        Select Case _sprache
+                    If Me.RichTextBox_Passwort.Text = "" Or Me.RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
+                        Select Case Me._sprache
                             Case "DE"
                                 MessageBox.Show("Passwort oder Texteingabe ist leer") 'Fehlermeldung ausgeben
                             Case Else
@@ -139,21 +140,21 @@ Public Class Main
                         End Select
                     Else 'Wenn Felder gefüllt sind
 
-                        If RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
-                            Select Case _sprache
+                        If Me.RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
+                            Select Case Me._sprache
                                 Case "DE"
                                     MessageBox.Show("Saltwert muss mindestens 8 Zeichen enthalten") _
-                                'Fehlermeldung ausgeben
+                                    'Fehlermeldung ausgeben
                                 Case Else
                                     MessageBox.Show("Salt value must contain at least 8 characters") _
                                     'Fehlermeldung ausgeben
                             End Select
                         Else
-                            _salt = Encoding.UTF32.GetBytes(RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
-                            Call EncryptAes(128, RichTextBox_Eingabe.Text, RichTextBox_Passwort.Text) _
+                            Me._salt = Encoding.UTF32.GetBytes(Me.RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
+                            Call Me.EncryptAes(128, Me.RichTextBox_Eingabe.Text, Me.RichTextBox_Passwort.Text) _
                             'Verschlüsselung aufrufen
-                            RichTextBox_Ausgabe.Clear() 'Ausgabebox leeren
-                            RichTextBox_Ausgabe.Text = _encryptedString 'Verschlüsselten Text ausgeben
+                            Me.RichTextBox_Ausgabe.Clear() 'Ausgabebox leeren
+                            Me.RichTextBox_Ausgabe.Text = Me._encryptedString 'Verschlüsselten Text ausgeben
                         End If
                     End If
             End Select
@@ -164,10 +165,10 @@ Public Class Main
 
     Private Sub Button_Entschluesseln_Click(sender As Object, e As EventArgs) Handles Button_Entschluesseln.Click
         Try
-            Select Case ComboBox_Art.SelectedIndex
+            Select Case Me.ComboBox_Art.SelectedIndex
                 Case 0 'AES-256 ausgewählt
-                    If RichTextBox_Passwort.Text = "" Or RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
-                        Select Case _sprache
+                    If Me.RichTextBox_Passwort.Text = "" Or Me.RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
+                        Select Case Me._sprache
                             Case "DE"
                                 MessageBox.Show("Passwort oder Texteingabe ist leer") 'Fehlermeldung ausgeben
                             Case Else
@@ -175,26 +176,26 @@ Public Class Main
                         End Select
                     Else 'Wenn Felder gefüllt sind
 
-                        If RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
-                            Select Case _sprache
+                        If Me.RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
+                            Select Case Me._sprache
                                 Case "DE"
                                     MessageBox.Show("Saltwert muss mindestens 8 Zeichen enthalten") _
-                                'Fehlermeldung ausgeben
+                                    'Fehlermeldung ausgeben
                                 Case Else
                                     MessageBox.Show("Salt value must contain at least 8 characters") _
                                     'Fehlermeldung ausgeben
                             End Select
                         Else
-                            _salt = Encoding.UTF32.GetBytes(RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
-                            Call DecryptAes(256, RichTextBox_Eingabe.Text, RichTextBox_Passwort.Text) _
+                            Me._salt = Encoding.UTF32.GetBytes(Me.RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
+                            Call Me.DecryptAes(256, Me.RichTextBox_Eingabe.Text, Me.RichTextBox_Passwort.Text) _
                             'Entschlüsselung aufrufen
-                            RichTextBox_Ausgabe.Clear() 'Ausgabebox leeren
-                            RichTextBox_Ausgabe.Text = _decryptedString 'Entschlüsselten Text ausgeben
+                            Me.RichTextBox_Ausgabe.Clear() 'Ausgabebox leeren
+                            Me.RichTextBox_Ausgabe.Text = Me._decryptedString 'Entschlüsselten Text ausgeben
                         End If
                     End If
                 Case 1 'AES-128 ausgewählt
-                    If RichTextBox_Passwort.Text = "" Or RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
-                        Select Case _sprache
+                    If Me.RichTextBox_Passwort.Text = "" Or Me.RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
+                        Select Case Me._sprache
                             Case "DE"
                                 MessageBox.Show("Passwort oder Texteingabe ist leer") 'Fehlermeldung ausgeben
                             Case Else
@@ -202,21 +203,21 @@ Public Class Main
                         End Select
                     Else 'Wenn Felder gefüllt sind
 
-                        If RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
-                            Select Case _sprache
+                        If Me.RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
+                            Select Case Me._sprache
                                 Case "DE"
                                     MessageBox.Show("Saltwert muss mindestens 8 Zeichen enthalten") _
-                                'Fehlermeldung ausgeben
+                                    'Fehlermeldung ausgeben
                                 Case Else
                                     MessageBox.Show("Salt value must contain at least 8 characters") _
                                     'Fehlermeldung ausgeben
                             End Select
                         Else
-                            _salt = Encoding.UTF32.GetBytes(RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
-                            Call DecryptAes(128, RichTextBox_Eingabe.Text, RichTextBox_Passwort.Text) _
+                            Me._salt = Encoding.UTF32.GetBytes(Me.RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
+                            Call Me.DecryptAes(128, Me.RichTextBox_Eingabe.Text, Me.RichTextBox_Passwort.Text) _
                             'Entschlüsselung aufrufen
-                            RichTextBox_Ausgabe.Clear() 'Ausgabebox leeren
-                            RichTextBox_Ausgabe.Text = _decryptedString 'Entschlüsselten Text ausgeben
+                            Me.RichTextBox_Ausgabe.Clear() 'Ausgabebox leeren
+                            Me.RichTextBox_Ausgabe.Text = Me._decryptedString 'Entschlüsselten Text ausgeben
                         End If
                     End If
             End Select
@@ -226,10 +227,10 @@ Public Class Main
     End Sub
 
     Private Sub Button_Alle_Resetten_Click(sender As Object, e As EventArgs) Handles Button_Alle_Resetten.Click
-        RichTextBox_Salt.Clear() 'RichTextBox_Salt leeren
-        RichTextBox_Passwort.Clear() 'RichTextBox_Passwort leeren
-        RichTextBox_Eingabe.Clear() 'RichTextBox_Eingabe leeren
-        RichTextBox_Ausgabe.Clear() 'RichTextBox_Ausgabe leeren
+        Me.RichTextBox_Salt.Clear() 'RichTextBox_Salt leeren
+        Me.RichTextBox_Passwort.Clear() 'RichTextBox_Passwort leeren
+        Me.RichTextBox_Eingabe.Clear() 'RichTextBox_Eingabe leeren
+        Me.RichTextBox_Ausgabe.Clear() 'RichTextBox_Ausgabe leeren
     End Sub
 
     Private _encryptedString As String
@@ -238,7 +239,7 @@ Public Class Main
     ' Verschlüsseln
     Private Sub EncryptAes(aesKeySize As Integer, decryptedString As String, password As String)
 
-        Dim generierterKey As New Rfc2898DeriveBytes(password, _salt)
+        Dim generierterKey As New Rfc2898DeriveBytes(password, Me._salt, 600000, HashAlgorithmName.SHA256)
         Dim aes As Aes = Aes.Create()
         aes.KeySize = aesKeySize ' möglich sind 128 oder 256 bit
         aes.BlockSize = 128
@@ -260,7 +261,7 @@ Public Class Main
         cs.Close()
 
         ' Verschlüsselte Daten als String ausgeben: 
-        _encryptedString = Convert.ToBase64String(ms.ToArray)
+        Me._encryptedString = Convert.ToBase64String(ms.ToArray)
         ms.Close()
 
         aes.Clear()
@@ -269,7 +270,7 @@ Public Class Main
     ' Entschlüsseln
     Private Sub DecryptAes(aesKeySize As Int32, encryptedString As String, password As String)
 
-        Dim generierterKey As New Rfc2898DeriveBytes(password, _salt)
+        Dim generierterKey As New Rfc2898DeriveBytes(password, Me._salt, 600000, HashAlgorithmName.SHA256)
         ' Instanzierung des AES-Algorithmus-Objekts:
         Dim aes As Aes = Aes.Create()
         ' Ein mit 256 bit verschlüsselter String kann 
@@ -294,16 +295,16 @@ Public Class Main
             cs.Close()
 
             ' Die entschlüsselten Daten als String ausgeben: 
-            _decryptedString = Encoding.UTF32.GetString(ms.ToArray)
+            Me._decryptedString = Encoding.UTF32.GetString(ms.ToArray)
             ms.Close()
 
             aes.Clear()
         Catch ex As Exception
-            Select Case _sprache
+            Select Case Me._sprache
                 Case "DE"
-                    _decryptedString = "Ungültiges Passwort!"
+                    Me._decryptedString = "Ungültiges Passwort!"
                 Case Else
-                    _decryptedString = "Wrong password!"
+                    Me._decryptedString = "Wrong password!"
             End Select
 
         End Try
