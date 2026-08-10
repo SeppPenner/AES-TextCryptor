@@ -8,17 +8,23 @@ the result as a Base64 string in the output box. There is no file handling, no c
 library: the repository builds exactly one executable plus an Inno Setup installer. It is **not**
 published as a NuGet package.
 
-One solution `src/AESTextCryptor.sln` with exactly one project:
+One solution `src/AESTextCryptor.sln` with exactly two projects:
 
 - `src/AESTextCryptor/AESTextCryptor.vbproj`, `OutputType` `WinExe`, `UseWindowsForms`,
   `StartupObject` `AESTextCryptor.Main`. A `Form` is the startup object, so there is no `Program.vb`
   and no `My Project` folder.
+- `src/AESTextCryptor.Tests/AESTextCryptor.Tests.vbproj`, MSTest, added in version 1.0.8.0. It
+  targets the same `net*-windows` flavour as the application, because it references a Windows Forms
+  executable.
 
 Layout inside `src/AESTextCryptor`:
 
-- `Main.vb`: everything. Language handling in `Form1_Load`, the two translation routines
-  `AllesAufDeutsch` and `AllesAufEnglisch`, the three button handlers and the private crypto
-  routines `EncryptAes` and `DecryptAes`.
+- `Main.vb`: the form. Language handling in `Form1_Load`, the two translation routines
+  `AllesAufDeutsch` and `AllesAufEnglisch`, the three button handlers and the small private helpers
+  around them (`EingabenSindGueltig`, `GewaehlteSchluessellaenge`, `ShowError`, `ShowWarning`).
+- `AesCryptor.vb`: the crypto, `Encrypt` and `Decrypt` as `Shared` functions plus the private
+  `ValidateSalt` and `InitializeAes`. No Windows Forms reference, which is what makes it testable.
+  It knows nothing about languages: it throws, the form turns that into a message.
 - `Main.Designer.vb` plus `Main.resx`: designer generated, `Main.resx` holds nothing but the form
   icon. Do not hand edit the designer file beyond what the designer itself would write.
 - `Config.ini`: one line, `EN` or `DE`, copied to the output directory with
@@ -27,6 +33,17 @@ Layout inside `src/AESTextCryptor`:
   `CopyToOutputDirectory=Never`.
 - `License.txt`: copied to the output directory, identical to the `License.txt` in the repository
   root, and the `LicenseFile` of the installer.
+
+Layout inside `src/AESTextCryptor.Tests`:
+
+- `AesCryptorTests.vb`: the roundtrip for both key sizes, the fact that the same input always gives
+  the same output, Base64 and length, the two reference values from version 1.0.7.0, umlauts and a
+  surrogate pair, the empty text, a wrong password, a wrong salt, the wrong key size, invalid Base64,
+  the salt length boundary and an invalid key size.
+- `TestDataProvider.vb`: password, salt, plain text and the two Base64 strings that version 1.0.7.0
+  produced from them. **Do not change these values.** They are the only guard against a change that
+  silently makes every text encrypted by an older version unreadable. The plain text is ASCII on
+  purpose, so that the reference values do not depend on the encoding of the source file.
 
 Repository root: `README.md` (the only user documentation), `Changelog.md`, `License.txt` (MIT),
 `Screenshot_DE.PNG`, `Screenshot_EN.PNG`, `.gitattributes`, `.gitignore` and the `Setup` folder.
@@ -42,9 +59,14 @@ The installer is tracked although `.gitignore` excludes `*.exe`, so it needs `gi
 dotnet build src/AESTextCryptor.sln -c Release
 ```
 
-- Single target framework `net9.0-windows`, no multi-targeting, `RuntimeIdentifiers` `win-x64`.
-- All build properties live directly in `AESTextCryptor.vbproj`. There is **no**
-  `Directory.Build.props` in this repository.
+```powershell
+dotnet test src/AESTextCryptor.sln -c Release
+```
+
+- Single target framework `net9.0-windows` in both projects, no multi-targeting,
+  `RuntimeIdentifiers` `win-x64`.
+- All build properties live directly in the two `.vbproj` files and are duplicated there. There is
+  **no** `Directory.Build.props` in this repository.
 - A clean build reports zero warnings, keep it that way. `NuGetAudit` and `NuGetAuditMode=all` are
   on, so a vulnerable transitive package breaks the build.
 - `NU1803` (HTTP source usage during restore) is the one warning suppressed via `NoWarn`. Fix
@@ -54,7 +76,10 @@ dotnet build src/AESTextCryptor.sln -c Release
 - Restore needs nuget.org. If a private feed is configured globally on the machine and answers 404
   for public packages, restore fails with `NU1301`. Then build with an explicit source:
   `dotnet build src/AESTextCryptor.sln --source https://api.nuget.org/v3/index.json`.
-- There are no unit tests. A behaviour change is verified by starting the executable and doing a
+- Tests are MSTest in the single test project `src/AESTextCryptor.Tests`, `dotnet test` runs 19 of
+  them. They need no network and no fixture outside the repository, they touch neither the file
+  system nor the form. Never claim a test run happened without running it.
+- Beyond the tests, a behaviour change in the form is verified by starting the executable and doing a
   roundtrip by hand: encrypt a text, copy the output back into the input box, decrypt it and compare.
 - The installer is built by `Setup/build-setup-files.bat` followed by `ISCC.exe` on
   `Setup/AES-TextCryptor-Skript.iss`. The batch file deletes every `bin` and `obj` below `src`,
@@ -88,15 +113,15 @@ Do not silently "clean up" these, they are existing behaviour:
 - **The language is read at startup and never written back.** `Form1_Load` reads `Config.ini`, the
   two radio buttons only switch the texts of the running instance. `README.md` documents exactly
   that: to change the language permanently you edit the file. The radio buttons are not broken.
-- **The config reader takes the last line of the file, not the first.** The `While r.Peek() > -1`
-  loop overwrites `_sprache` on every line. Anything other than `DE` selects English, because the
+- **The config reader takes the last filled line of the file, not the first.** The loop overwrites
+  `_sprache` on every line that is not blank. Anything other than `DE` selects English, because the
   `Select Case` has no `Case "EN"` but a `Case Else`. A missing or empty `Config.ini` therefore
-  yields English.
+  yields English, and so does a file the application cannot read.
 - **UTF-32 everywhere.** The salt, the plain text and the decrypted text all go through
   `Encoding.UTF32`. That is unusual, but it is part of the format on the wire: a text encrypted by
   an older version only decrypts because the encoding is still UTF-32. Never switch this to UTF-8.
-- **The salt needs eight characters, not eight bytes.** The check is
-  `RichTextBox_Salt.TextLength < 8`, and `Rfc2898DeriveBytes` wants at least eight **bytes**. Since
+- **The salt needs eight characters, not eight bytes.** The form and `AesCryptor` both check against
+  `AesCryptor.MinimumSaltLength`, and `Rfc2898DeriveBytes` wants at least eight **bytes**. Since
   UTF-32 produces four bytes per character, eight characters are 32 bytes, so the check is stricter
   than the framework requires, not weaker.
 - **Key and IV both come from the same `Rfc2898DeriveBytes` instance, in that order.** `GetBytes` is
@@ -105,12 +130,13 @@ Do not silently "clean up" these, they are existing behaviour:
   iterations and `HashAlgorithmName.SHA256`.
 - **`Aes.Create()` defaults are part of the format too**, that is CBC and PKCS7. They are never set
   explicitly, only `KeySize` and `BlockSize` are.
-- **Decryption reports "wrong password" for every failure.** `DecryptAes` catches everything and
-  puts a localized text into the output box, so invalid Base64 also reads as a wrong password.
-- **The four button handler branches are duplicated.** AES-256 and AES-128 differ in a single
-  number, encrypt and decrypt differ in one call, the validation is written out four times. Left as
-  it is, a rewrite of that method is not a side task.
-- **Error dialogs are bare.** `MessageBox.Show(ex.Message)` without title, buttons or icon.
+- **Encryption is deterministic.** The IV comes out of the key derivation instead of a random
+  generator, so the same text, password and salt always produce the same Base64 string. That is
+  weaker than a random IV, but it is the format, and a test pins it down.
+- **Decryption reports "wrong password" for a wrong password and for invalid Base64.** The form
+  catches `CryptographicException` and `FormatException` from `AesCryptor.Decrypt` and puts a
+  localized text into the output box instead of a dialog. Every other exception is a real error and
+  reaches the error dialog.
 - **`src/Config.ini` and `src/AES.ico` are duplicates.** They sit one directory above the copies in
   `src/AESTextCryptor` and belong to the folder layout from before version 1.0.2.0. Nothing
   references them, they are tracked, leave them alone unless asked.
