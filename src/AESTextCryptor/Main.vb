@@ -1,7 +1,6 @@
 Option Strict On
 
 Imports System.IO
-Imports System.Reflection
 Imports System.Security.Cryptography
 Imports System.Text
 Imports System.Windows.Forms
@@ -12,27 +11,22 @@ Public Class Main
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'Datei öffnen und Sprache auslesen:
         Try
-            'Datei öffnen
-            Dim directoryLocation As String = Assembly.GetExecutingAssembly().Location
-            Dim configFile = ""
-            If (directoryLocation <> Nothing) Then
-                configFile = Path.Combine(Directory.GetParent(directoryLocation).FullName, "Config.ini")
-            End If
+            'Die Config.ini liegt neben der Exe. AppContext.BaseDirectory liefert das Verzeichnis auch
+            'dann, wenn Assembly.Location leer ist, also bei einem Single-File-Publish
+            Dim configFile = Path.Combine(AppContext.BaseDirectory, "Config.ini")
 
-            Dim fs = New FileStream(configFile, FileMode.OpenOrCreate, FileAccess.ReadWrite)
-            'Stream öffnen
-            Dim r = New StreamReader(fs)
-            'Zeiger auf den Anfang
-            r.BaseStream.Seek(0, SeekOrigin.Begin)
-            'Alle Zeilen lesen und an Console ausgeben
-            While r.Peek() > -1
-                Me._sprache = r.ReadLine() 'Sprache festsetzen
-            End While
-            'Reader und Stream schließen
-            r.Close()
-            fs.Close()
+            'Nur lesend öffnen und nur, wenn die Datei da ist. Vorher wurde sie zum Lesen mit
+            'Schreibzugriff geöffnet und bei Bedarf angelegt, was im Installationsverzeichnis unter
+            'Programme ohne Administratorrechte fehlschlägt
+            If File.Exists(configFile) Then
+                For Each configLine In File.ReadLines(configFile)
+                    If Not String.IsNullOrWhiteSpace(configLine) Then
+                        Me._sprache = configLine.Trim() 'Sprache festsetzen, die letzte gefüllte Zeile gewinnt
+                    End If
+                Next
+            End If
         Catch ex As Exception
-            MessageBox.Show(ex.Message) 'Fehlermeldung ausgeben
+            Call Me.ShowError(ex) 'Fehlermeldung ausgeben
         End Try
         'Verschlüsselungsarten anzeigen:
         Me.ComboBox_Art.Items.Add("AES-256") 'AES-256 als Verschlüsselungsart hinzufügen
@@ -105,23 +99,13 @@ Public Class Main
             Select Case Me.ComboBox_Art.SelectedIndex
                 Case 0 'AES-256 ausgewählt
                     If Me.RichTextBox_Passwort.Text = "" Or Me.RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
-                        Select Case Me._sprache
-                            Case "DE"
-                                MessageBox.Show("Passwort oder Texteingabe ist leer") 'Fehlermeldung ausgeben
-                            Case Else
-                                MessageBox.Show("Password or text is empty") 'Fehlermeldung ausgeben
-                        End Select
+                        Call Me.ShowWarning("Passwort oder Texteingabe ist leer",
+                                            "Password or text is empty") 'Hinweis ausgeben
                     Else 'Wenn Felder gefüllt sind
 
                         If Me.RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
-                            Select Case Me._sprache
-                                Case "DE"
-                                    MessageBox.Show("Saltwert muss mindestens 8 Zeichen enthalten") _
-                                    'Fehlermeldung ausgeben
-                                Case Else
-                                    MessageBox.Show("Salt value must contain at least 8 characters") _
-                                    'Fehlermeldung ausgeben
-                            End Select
+                            Call Me.ShowWarning("Saltwert muss mindestens 8 Zeichen enthalten",
+                                                "Salt value must contain at least 8 characters") 'Hinweis ausgeben
                         Else
                             Me._salt = Encoding.UTF32.GetBytes(Me.RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
                             Call Me.EncryptAes(256, Me.RichTextBox_Eingabe.Text, Me.RichTextBox_Passwort.Text) _
@@ -132,23 +116,13 @@ Public Class Main
                     End If
                 Case 1 'AES-128 ausgewählt
                     If Me.RichTextBox_Passwort.Text = "" Or Me.RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
-                        Select Case Me._sprache
-                            Case "DE"
-                                MessageBox.Show("Passwort oder Texteingabe ist leer") 'Fehlermeldung ausgeben
-                            Case Else
-                                MessageBox.Show("Password or text is empty") 'Fehlermeldung ausgeben
-                        End Select
+                        Call Me.ShowWarning("Passwort oder Texteingabe ist leer",
+                                            "Password or text is empty") 'Hinweis ausgeben
                     Else 'Wenn Felder gefüllt sind
 
                         If Me.RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
-                            Select Case Me._sprache
-                                Case "DE"
-                                    MessageBox.Show("Saltwert muss mindestens 8 Zeichen enthalten") _
-                                    'Fehlermeldung ausgeben
-                                Case Else
-                                    MessageBox.Show("Salt value must contain at least 8 characters") _
-                                    'Fehlermeldung ausgeben
-                            End Select
+                            Call Me.ShowWarning("Saltwert muss mindestens 8 Zeichen enthalten",
+                                                "Salt value must contain at least 8 characters") 'Hinweis ausgeben
                         Else
                             Me._salt = Encoding.UTF32.GetBytes(Me.RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
                             Call Me.EncryptAes(128, Me.RichTextBox_Eingabe.Text, Me.RichTextBox_Passwort.Text) _
@@ -159,7 +133,7 @@ Public Class Main
                     End If
             End Select
         Catch ex As Exception
-            MessageBox.Show(ex.Message) 'Fehlermeldung ausgeben
+            Call Me.ShowError(ex) 'Fehlermeldung ausgeben
         End Try
     End Sub
 
@@ -168,23 +142,13 @@ Public Class Main
             Select Case Me.ComboBox_Art.SelectedIndex
                 Case 0 'AES-256 ausgewählt
                     If Me.RichTextBox_Passwort.Text = "" Or Me.RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
-                        Select Case Me._sprache
-                            Case "DE"
-                                MessageBox.Show("Passwort oder Texteingabe ist leer") 'Fehlermeldung ausgeben
-                            Case Else
-                                MessageBox.Show("Password or text is empty") 'Fehlermeldung ausgeben
-                        End Select
+                        Call Me.ShowWarning("Passwort oder Texteingabe ist leer",
+                                            "Password or text is empty") 'Hinweis ausgeben
                     Else 'Wenn Felder gefüllt sind
 
                         If Me.RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
-                            Select Case Me._sprache
-                                Case "DE"
-                                    MessageBox.Show("Saltwert muss mindestens 8 Zeichen enthalten") _
-                                    'Fehlermeldung ausgeben
-                                Case Else
-                                    MessageBox.Show("Salt value must contain at least 8 characters") _
-                                    'Fehlermeldung ausgeben
-                            End Select
+                            Call Me.ShowWarning("Saltwert muss mindestens 8 Zeichen enthalten",
+                                                "Salt value must contain at least 8 characters") 'Hinweis ausgeben
                         Else
                             Me._salt = Encoding.UTF32.GetBytes(Me.RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
                             Call Me.DecryptAes(256, Me.RichTextBox_Eingabe.Text, Me.RichTextBox_Passwort.Text) _
@@ -195,23 +159,13 @@ Public Class Main
                     End If
                 Case 1 'AES-128 ausgewählt
                     If Me.RichTextBox_Passwort.Text = "" Or Me.RichTextBox_Eingabe.Text = "" Then 'Wenn Felder leer sind
-                        Select Case Me._sprache
-                            Case "DE"
-                                MessageBox.Show("Passwort oder Texteingabe ist leer") 'Fehlermeldung ausgeben
-                            Case Else
-                                MessageBox.Show("Password or text is empty") 'Fehlermeldung ausgeben
-                        End Select
+                        Call Me.ShowWarning("Passwort oder Texteingabe ist leer",
+                                            "Password or text is empty") 'Hinweis ausgeben
                     Else 'Wenn Felder gefüllt sind
 
                         If Me.RichTextBox_Salt.TextLength < 8 Then 'Wenn Saltwert zu klein ist
-                            Select Case Me._sprache
-                                Case "DE"
-                                    MessageBox.Show("Saltwert muss mindestens 8 Zeichen enthalten") _
-                                    'Fehlermeldung ausgeben
-                                Case Else
-                                    MessageBox.Show("Salt value must contain at least 8 characters") _
-                                    'Fehlermeldung ausgeben
-                            End Select
+                            Call Me.ShowWarning("Saltwert muss mindestens 8 Zeichen enthalten",
+                                                "Salt value must contain at least 8 characters") 'Hinweis ausgeben
                         Else
                             Me._salt = Encoding.UTF32.GetBytes(Me.RichTextBox_Salt.Text) 'Salt aus Benutzereingabe auslesen
                             Call Me.DecryptAes(128, Me.RichTextBox_Eingabe.Text, Me.RichTextBox_Passwort.Text) _
@@ -222,7 +176,7 @@ Public Class Main
                     End If
             End Select
         Catch ex As Exception
-            MessageBox.Show(ex.Message) 'Fehlermeldung ausgeben
+            Call Me.ShowError(ex) 'Fehlermeldung ausgeben
         End Try
     End Sub
 
@@ -231,6 +185,33 @@ Public Class Main
         Me.RichTextBox_Passwort.Clear() 'RichTextBox_Passwort leeren
         Me.RichTextBox_Eingabe.Clear() 'RichTextBox_Eingabe leeren
         Me.RichTextBox_Ausgabe.Clear() 'RichTextBox_Ausgabe leeren
+    End Sub
+
+    Private Sub ShowError(ex As Exception) 'Fehlermeldung mit Titel und Symbol ausgeben
+        Dim titel As String
+        Select Case Me._sprache
+            Case "DE"
+                titel = "Fehler" 'Titel auf Deutsch
+            Case Else
+                titel = "Error" 'Titel auf Englisch
+        End Select
+
+        MessageBox.Show(ex.Message, titel, MessageBoxButtons.OK, MessageBoxIcon.Error)
+    End Sub
+
+    Private Sub ShowWarning(deutscherText As String, englischerText As String) 'Hinweis mit Titel und Symbol ausgeben
+        Dim titel As String
+        Dim text As String
+        Select Case Me._sprache
+            Case "DE"
+                titel = "Hinweis" 'Titel auf Deutsch
+                text = deutscherText
+            Case Else
+                titel = "Notice" 'Titel auf Englisch
+                text = englischerText
+        End Select
+
+        MessageBox.Show(text, titel, MessageBoxButtons.OK, MessageBoxIcon.Warning)
     End Sub
 
     Private _encryptedString As String
