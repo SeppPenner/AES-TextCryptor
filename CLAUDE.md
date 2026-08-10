@@ -37,11 +37,11 @@ Layout inside `src/AESTextCryptor`:
 Layout inside `src/AESTextCryptor.Tests`:
 
 - `AesCryptorTests.vb`: the roundtrip for both key sizes, the fact that the same input always gives
-  the same output, Base64 and length, the two reference values from version 1.0.7.0, umlauts and a
+  the same output, Base64 and length, the three reference values from version 1.0.7.0, umlauts and a
   surrogate pair, the empty text, a wrong password, a wrong salt, the wrong key size, invalid Base64,
   the salt length boundary and an invalid key size.
-- `TestDataProvider.vb`: password, salt, plain text and the two Base64 strings that version 1.0.7.0
-  produced from them. **Do not change these values.** They are the only guard against a change that
+- `TestDataProvider.vb`: password, salt, plain text and the three Base64 strings that version 1.0.7.0
+  produced from them, one of them with a password containing umlauts, written with `ChrW`. **Do not change these values.** They are the only guard against a change that
   silently makes every text encrypted by an older version unreadable. The plain text is ASCII on
   purpose, so that the reference values do not depend on the encoding of the source file.
 
@@ -63,12 +63,14 @@ dotnet build src/AESTextCryptor.sln -c Release
 dotnet test src/AESTextCryptor.sln -c Release
 ```
 
-- Single target framework `net9.0-windows` in both projects, no multi-targeting,
+- Single target framework `net10.0-windows` in both projects, no multi-targeting,
   `RuntimeIdentifiers` `win-x64`.
 - All build properties live directly in the two `.vbproj` files and are duplicated there. There is
   **no** `Directory.Build.props` in this repository.
-- A clean build reports zero warnings, keep it that way. `NuGetAudit` and `NuGetAuditMode=all` are
-  on, so a vulnerable transitive package breaks the build.
+- `TreatWarningsAsErrors` is enabled in both projects, so every warning breaks the build, NuGet
+  warnings (`NU****`) from restore and obsoletion warnings (`SYSLIB****`) included. A clean build
+  reports zero warnings, keep it that way. `NuGetAudit` and `NuGetAuditMode=all` are on, so a
+  vulnerable transitive package breaks the build too.
 - `NU1803` (HTTP source usage during restore) is the one warning suppressed via `NoWarn`. Fix
   warnings instead of extending that list.
 - Versions come from GitVersion.MsBuild out of the git tags, for example `1.0.8-1` for the first
@@ -76,7 +78,7 @@ dotnet test src/AESTextCryptor.sln -c Release
 - Restore needs nuget.org. If a private feed is configured globally on the machine and answers 404
   for public packages, restore fails with `NU1301`. Then build with an explicit source:
   `dotnet build src/AESTextCryptor.sln --source https://api.nuget.org/v3/index.json`.
-- Tests are MSTest in the single test project `src/AESTextCryptor.Tests`, `dotnet test` runs 19 of
+- Tests are MSTest in the single test project `src/AESTextCryptor.Tests`, `dotnet test` runs 20 of
   them. They need no network and no fixture outside the repository, they touch neither the file
   system nor the form. Never claim a test run happened without running it.
 - Beyond the tests, a behaviour change in the form is verified by starting the executable and doing a
@@ -124,10 +126,16 @@ Do not silently "clean up" these, they are existing behaviour:
   `AesCryptor.MinimumSaltLength`, and `Rfc2898DeriveBytes` wants at least eight **bytes**. Since
   UTF-32 produces four bytes per character, eight characters are 32 bytes, so the check is stricter
   than the framework requires, not weaker.
-- **Key and IV both come from the same `Rfc2898DeriveBytes` instance, in that order.** `GetBytes` is
-  a stream: the first call returns the key, the second the IV. Swapping the two lines or deriving
-  them separately breaks every text ever encrypted by this application. Same for the 600000
-  iterations and `HashAlgorithmName.SHA256`.
+- **Key and IV come from one PBKDF2 run, in that order.** `AesCryptor` asks
+  `Rfc2898DeriveBytes.Pbkdf2` for key length plus IV length in one go and splits the result, the key
+  first. Up to version 1.0.7.0 those were two `GetBytes` calls on an `Rfc2898DeriveBytes` instance,
+  which yields exactly the same bytes, and the reference values in the tests prove it. The
+  constructors of that class are obsolete since .NET 10 (`SYSLIB0060`), which is why the static
+  method is used. Swapping key and IV, or deriving them separately, breaks every text ever encrypted
+  by this application. Same for the 600000 iterations and `HashAlgorithmName.SHA256`.
+- **The password goes into the derivation as UTF-8, the salt as UTF-32.** The salt conversion is
+  explicit in `AesCryptor`, the password conversion happens inside `Pbkdf2`. That asymmetry looks
+  like an oversight and is one, but it is part of the format.
 - **`Aes.Create()` defaults are part of the format too**, that is CBC and PKCS7. They are never set
   explicitly, only `KeySize` and `BlockSize` are.
 - **Encryption is deterministic.** The IV comes out of the key derivation instead of a random

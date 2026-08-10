@@ -80,6 +80,17 @@ Public Class AesCryptorTests
         Assert.AreEqual(TestDataProvider.EncryptedByVersion107Aes128, encrypted)
     End Sub
 
+    'Ein Passwort mit Umlauten geht als UTF-8 in die Schlüsselableitung. Ohne diesen Test würde ein
+    'Wechsel der Passwortkodierung nur Anwender mit Nicht-ASCII-Passwörtern treffen und keinem
+    'anderen Test auffallen
+    <TestMethod>
+    Public Sub EncryptProducesTheSameTextAsVersion107WithAPasswordWithUmlauts()
+        Dim encrypted = AesCryptor.Encrypt(256, TestDataProvider.PlainText, TestDataProvider.PasswordWithUmlauts,
+                                           TestDataProvider.Salt)
+
+        Assert.AreEqual(TestDataProvider.EncryptedByVersion107WithUmlautPassword, encrypted)
+    End Sub
+
     'Ein von Version 1.0.7.0 verschlüsselter Text muss sich weiterhin entschlüsseln lassen
     <TestMethod>
     Public Sub DecryptReadsTheTextThatVersion107Encrypted()

@@ -22,6 +22,19 @@ Friend NotInheritable Class TestDataProvider
     Friend Const EncryptedByVersion107Aes128 As String =
         "wvEa0n38E3nMu8Lzv645+nhm8Dz9KrT6fljcXhwWq6hTLWewkwkhCNvigOxCJ+57LwCQi2p/oslBEVp7QF3Dng=="
 
+    'Der Text von oben mit dem Passwort aus PasswordWithUmlauts, AES-256, Version 1.0.7.0. Hält
+    'fest, mit welcher Kodierung das Passwort in die Schlüsselableitung geht
+    Friend Const EncryptedByVersion107WithUmlautPassword As String =
+        "vPix7Eep093cjHssxPzNagEWfHUXpmECvCxErU6eTM8MPTuU02F3F8+XhyUZyIKDCYeB4+Qlo4k+UtLU+i0QBA=="
+
+    'Ein Passwort mit Nicht-ASCII-Zeichen, per ChrW geschrieben, damit die Kodierung der Quelldatei
+    'keine Rolle spielt: P, a mit Umlaut, ss, scharfes s
+    Friend Shared ReadOnly Property PasswordWithUmlauts As String
+        Get
+            Return "P" & ChrW(&HE4) & "ss" & ChrW(&HDF)
+        End Get
+    End Property
+
     'Nur geteilte Member, wird nie instanziert
     Private Sub New()
     End Sub

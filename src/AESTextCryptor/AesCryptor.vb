@@ -84,12 +84,22 @@ Public NotInheritable Class AesCryptor
         aes.KeySize = aesKeySize 'möglich sind 128 oder 256 bit
         aes.BlockSize = AesBlockSize
 
-        Using derivedKey As New Rfc2898DeriveBytes(password, Encoding.UTF32.GetBytes(salt), KeyDerivationIterations,
-                                                   HashAlgorithmName.SHA256)
-            'Die Reihenfolge gehört zum Format: GetBytes liefert einen Strom, der erste Aufruf den
-            'Schlüssel, der zweite den IV
-            aes.Key = derivedKey.GetBytes(aes.KeySize \ 8)
-            aes.IV = derivedKey.GetBytes(aes.BlockSize \ 8)
-        End Using
+        Dim keyLength = aes.KeySize \ 8
+        Dim ivLength = aes.BlockSize \ 8
+
+        'Bis Version 1.0.7.0 waren das zwei GetBytes-Aufrufe auf einer Rfc2898DeriveBytes-Instanz.
+        'Deren Konstruktoren sind seit .NET 10 veraltet (SYSLIB0060), Pbkdf2 liefert denselben
+        'Bytestrom in einem Stück. Die Reihenfolge gehört zum Format: erst der Schlüssel, dann der IV
+        Dim derivedBytes = Rfc2898DeriveBytes.Pbkdf2(password, Encoding.UTF32.GetBytes(salt),
+                                                    KeyDerivationIterations, HashAlgorithmName.SHA256,
+                                                    keyLength + ivLength)
+
+        Dim key(keyLength - 1) As Byte
+        Dim iv(ivLength - 1) As Byte
+        Array.Copy(derivedBytes, 0, key, 0, keyLength)
+        Array.Copy(derivedBytes, keyLength, iv, 0, ivLength)
+
+        aes.Key = key
+        aes.IV = iv
     End Sub
 End Class
