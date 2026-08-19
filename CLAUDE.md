@@ -51,7 +51,9 @@ There is no `Updating.md` and no `HowToUse.md`.
 
 `Setup` contains the Inno Setup script `AES-TextCryptor-Skript.iss` (German file name, kept),
 the publish helper `build-setup-files.bat` and the built installer `AES-TextCryptor-Setup.exe`.
-The installer is tracked although `.gitignore` excludes `*.exe`, so it needs `git add -f`.
+The installer is not tracked, `.gitignore` excludes `*.exe` and it hangs on the GitHub release of
+its version tag instead. Up to and including 1.0.8 it was committed with `git add -f`, which is why
+the history carries one copy per release.
 
 ## Build
 
@@ -164,13 +166,31 @@ Do not silently "clean up" these, they are existing behaviour:
    tags are lightweight tags, create new ones the same way. **The tag comes before the installer
    build**, otherwise GitVersion burns a prerelease version into the shipped executable.
 6. Run `Setup/build-setup-files.bat`, then `ISCC.exe Setup/AES-TextCryptor-Skript.iss`.
-7. `git add -f Setup/AES-TextCryptor-Setup.exe` and commit it, the usual message is
-   `Updated setup.`.
-8. Push the commits and the tag.
+7. Push the commits and the tag.
+8. Attach `Setup/AES-TextCryptor-Setup.exe` to the GitHub release of that tag. **Never commit the
+   installer.** `Setup/` is the `OutputDir` of the Inno Setup script, so the file lands there during
+   the build and `.gitignore` covers it afterwards.
 
 The version in the `Changelog.md` has four parts (`1.0.8.0`), the tag has three (`1.0.8`).
 GitVersion turns the tag into the assembly version, so an untagged commit produces something like
-`1.0.8-1+Branch.master.Sha...`. There is no package to push, so the release ends with the push.
+`1.0.8-1+Branch.master.Sha...`. There is no package to push, so the release ends with the asset
+upload.
+
+For step 8 there is no `gh` on this machine. The GitHub API does the job, with the token that
+`git push` already uses, so nothing has to be stored anywhere:
+
+```bash
+c=$(printf "protocol=https\nhost=github.com\n\n" | git credential fill)
+tok=$(printf "%s" "$c" | grep '^password=' | cut -d= -f2-)
+id=$(curl -s -X POST -H "Authorization: Bearer $tok" \
+  https://api.github.com/repos/SeppPenner/AES-TextCryptor/releases \
+  -d '{"tag_name":"1.0.9","name":"1.0.9"}' | grep -m1 '"id"' | tr -dc 0-9)
+curl -s -X POST -H "Authorization: Bearer $tok" -H "Content-Type: application/octet-stream" \
+  --data-binary @Setup/AES-TextCryptor-Setup.exe \
+  "https://uploads.github.com/repos/SeppPenner/AES-TextCryptor/releases/$id/assets?name=AES-TextCryptor-Setup.exe"
+```
+
+Never print that token, and never write it into a file.
 
 ## Git
 
